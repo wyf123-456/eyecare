@@ -34,7 +34,7 @@ from model.predict import (
 # 工具函数
 # ============================================================
 
-SAMPLE_IMAGES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static", "sample_images")
+SAMPLE_IMAGES_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def load_sample_image(image_file, size=None):
@@ -715,7 +715,10 @@ def render_screening():
             # 仪表盘
             risk_score = 0.1 if result["severity"] == 0 else \
                          0.5 if result["severity"] == 1 else 0.85
-            gauge_img = draw_risk_gauge(risk_level, risk_score, risk_color, figsize=(5, 2.5))
+            # 仪表盘里用英文，避免Linux服务器中文字体乱码
+            gauge_risk_label = "LOW RISK" if result["severity"] == 0 else \
+                               "MODERATE RISK" if result["severity"] == 1 else "HIGH RISK"
+            gauge_img = draw_risk_gauge(gauge_risk_label, risk_score, risk_color, figsize=(5, 2.5))
             st.image(gauge_img, use_container_width=True)
 
     # 下方：详细结果
@@ -748,7 +751,29 @@ def render_screening():
 
         with c1:
             st.markdown("### 📈 诊断概率分布")
-            bar_img = draw_prediction_barplot(result["all_predictions"], figsize=(8, 4.5))
+            # 把类别名转成英文，避免matplotlib中文乱码
+            en_name_map = {
+                "正常": "Normal",
+                "轻度糖尿病视网膜病变": "Mild DR",
+                "中度糖尿病视网膜病变": "Moderate DR",
+                "重度糖尿病视网膜病变": "Severe DR",
+                "增殖期糖尿病视网膜病变": "Proliferative DR",
+                "正常眼底": "Normal",
+                "轻度糖网": "Mild DR",
+                "中度糖网": "Moderate DR",
+                "重度糖网": "Severe DR",
+                "增殖期糖网": "Proliferative DR",
+            }
+            en_predictions = []
+            for p in result["all_predictions"]:
+                name = p.get("class", p.get("name", ""))
+                en_name = en_name_map.get(name, name)
+                en_predictions.append({
+                    "name": en_name,
+                    "probability": p.get("probability", p.get("prob", 0)),
+                    "is_primary": p.get("is_primary", False)
+                })
+            bar_img = draw_prediction_barplot(en_predictions, figsize=(8, 4.5))
             st.image(bar_img, use_container_width=True)
 
         with c2:
