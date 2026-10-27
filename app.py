@@ -730,9 +730,23 @@ def render_screening():
         st.markdown("### 🔬 影像分析")
 
         # 原图 vs 热力图对比
+        # 热力图标题用英文，避免matplotlib中文乱码
+        en_diag_map = {
+            "正常": "Normal",
+            "正常眼底": "Normal",
+            "轻度糖尿病视网膜病变": "Mild DR",
+            "轻度糖网": "Mild DR",
+            "中度糖尿病视网膜病变": "Moderate DR",
+            "中度糖网": "Moderate DR",
+            "重度糖尿病视网膜病变": "Severe DR",
+            "重度糖网": "Severe DR",
+            "增殖期糖尿病视网膜病变": "Proliferative DR",
+            "增殖期糖网": "Proliferative DR",
+        }
+        en_diagnosis = en_diag_map.get(result["primary_diagnosis"], result["primary_diagnosis"])
         comp_img = draw_fundus_comparison(
             data["fundus_img"], data["gradcam_img"],
-            result["primary_diagnosis"], figsize=(10, 4.5)
+            en_diagnosis, figsize=(10, 4.5)
         )
         st.image(comp_img, use_container_width=True)
 
