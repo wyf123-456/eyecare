@@ -14,8 +14,22 @@ import math
 
 
 def setup_matplotlib():
-    """配置中文字体"""
-    plt.rcParams['font.sans-serif'] = ['Microsoft YaHei', 'SimHei', 'Arial Unicode MS', 'sans-serif']
+    """配置中文字体，支持Windows/Linux/macOS"""
+    import matplotlib
+    # 尝试多种中文字体，按优先级排列
+    font_candidates = [
+        'Microsoft YaHei',    # Windows
+        'SimHei',              # Windows
+        'PingFang SC',         # macOS
+        'Heiti SC',            # macOS
+        'WenQuanYi Micro Hei', # Linux
+        'WenQuanYi Zen Hei',   # Linux
+        'Noto Sans CJK SC',    # Linux (Google Noto)
+        'Source Han Sans CN',  # 思源黑体
+        'Arial Unicode MS',    # 通用
+        'DejaVu Sans',         # 最后兜底（英文）
+    ]
+    plt.rcParams['font.sans-serif'] = font_candidates
     plt.rcParams['axes.unicode_minus'] = False
 
 
@@ -428,8 +442,8 @@ def draw_prediction_barplot(predictions: list, figsize=(8, 5)) -> Image.Image:
                 f'{prob:.1f}%', va='center', fontsize=11, fontweight='bold', color='#333')
 
     ax.set_xlim(0, 105)
-    ax.set_xlabel('预测概率 (%)', fontsize=12, color='#555')
-    ax.set_title('AI 诊断结果分布', fontsize=14, fontweight='bold', color='#333', pad=15)
+    ax.set_xlabel('Probability (%)', fontsize=12, color='#555')
+    ax.set_title('AI Diagnosis Distribution', fontsize=14, fontweight='bold', color='#333', pad=15)
     ax.tick_params(axis='y', labelsize=11)
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
@@ -573,11 +587,11 @@ def draw_fundus_comparison(fundus_img: Image.Image, gradcam_img: Image.Image,
     fig.patch.set_facecolor('white')
 
     ax1.imshow(fundus_img)
-    ax1.set_title('眼底原图', fontsize=13, fontweight='bold', pad=10)
+    ax1.set_title('Original Image', fontsize=13, fontweight='bold', pad=10)
     ax1.axis('off')
 
     ax2.imshow(gradcam_img)
-    ax2.set_title(f'Grad-CAM 热力图 → {diagnosis}', fontsize=13, fontweight='bold', pad=10)
+    ax2.set_title(f'Grad-CAM Heatmap → {diagnosis}', fontsize=13, fontweight='bold', pad=10)
     ax2.axis('off')
 
     plt.tight_layout()
