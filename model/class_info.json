@@ -1,0 +1,24 @@
+{
+  "classes": [
+    "正常",
+    "轻度糖网",
+    "中度糖网",
+    "重度糖网",
+    "增殖期糖网"
+  ],
+  "num_classes": 5,
+  "image_size": 224,
+  "best_val_acc": 72.13,
+  "class_to_idx": {
+    "normal": 0,
+    "dr_mild": 1,
+    "dr_moderate": 2,
+    "dr_severe": 3,
+    "dr_proliferative": 4
+  },
+  "train_epochs": 6,
+  "train_samples": 2930,
+  "val_samples": 366,
+  "model_arch": "MobileNetV2",
+  "training_date": "2026-10-27 16:41:22"
+}

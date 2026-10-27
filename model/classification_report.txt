@@ -1,0 +1,23 @@
+============================================================
+  EyeCare Model Evaluation Report
+  Model: MobileNetV2 (Transfer Learning on APTOS 2019)
+============================================================
+
+Dataset: APTOS 2019 Blindness Detection
+Validation samples: 366
+Overall Accuracy: 72.13%
+
+Classification Report:
+------------------------------------------------------------
+              precision    recall  f1-score   support
+
+          正常     0.9096    0.9942    0.9500       172
+        轻度糖网     0.4815    0.6500    0.5532        40
+        中度糖网     0.7042    0.4808    0.5714       104
+        重度糖网     0.2414    0.3182    0.2745        22
+       增殖期糖网     0.4167    0.3571    0.3846        28
+
+    accuracy                         0.7213       366
+   macro avg     0.5507    0.5601    0.5467       366
+weighted avg     0.7266    0.7213    0.7152       366
+
