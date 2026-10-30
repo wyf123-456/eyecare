@@ -24,6 +24,7 @@ from utils.visualizer import (
     draw_pipeline_flow, draw_performance_comparison,
     draw_fundus_comparison
 )
+from utils.llm_helper import ask_eye_doctor
 from model.predict import (
     generate_diagnosis_result, is_model_available, load_model,
     generate_diagnosis_result_with_gradcam
@@ -876,6 +877,65 @@ def render_health_education():
     st.markdown("了解眼底健康知识，守护光明")
     st.markdown("---")
 
+    # ====== AI眼科医生问答 ======
+    st.markdown("### 🤖 AI眼科医生在线问答")
+    st.markdown("有任何眼部健康问题？问问AI小助手吧～")
+
+    # API Key 输入（本地运行时手动输入，部署到Streamlit Cloud用secrets）
+    try:
+        api_key = st.secrets.get("DEEPSEEK_API_KEY", "")
+    except:
+        api_key = ""
+
+    if not api_key:
+        with st.expander("🔑 点击输入API Key（可选，不输入使用演示模式）", expanded=False):
+            api_key_input = st.text_input("DeepSeek API Key", type="password", key="llm_api_key")
+            if api_key_input:
+                api_key = api_key_input
+                st.success("API Key已设置！")
+            else:
+                st.info("💡 不输入API Key将使用演示模式，回答为预设内容。")
+
+    # 快速提问按钮
+    st.markdown("**快速提问：**")
+    quick_questions = [
+        "糖尿病患者怎么预防糖网？",
+        "眼睛经常干涩怎么办？",
+        "黄斑变性怎么预防？",
+        "眼底检查都查什么？"
+    ]
+    cols = st.columns(2)
+    for i, q in enumerate(quick_questions):
+        if cols[i % 2].button(q, key=f"quick_q_{i}", use_container_width=True):
+            st.session_state["llm_question"] = q
+
+    # 输入框
+    question = st.text_input("输入你的问题：", 
+                            value=st.session_state.get("llm_question", ""),
+                            placeholder="比如：糖网早期有什么症状？",
+                            key="llm_input")
+
+    if st.button("🔍 提问", type="primary", key="llm_submit"):
+        if question.strip():
+            with st.spinner("AI小助手正在思考..."):
+                answer = ask_eye_doctor(question, api_key=api_key)
+            
+            st.markdown("#### 📝 AI小助手的回答")
+            st.markdown(f"""
+            <div style="padding:1rem 1.25rem; background:#F0FDF4; border-radius:12px;
+                        border-left:4px solid #10B981; line-height:1.8;">
+                {answer.replace(chr(10), '<br>')}
+            </div>
+            """, unsafe_allow_html=True)
+            
+            st.caption("⚠️ 以上内容仅供健康科普参考，不能替代专业医疗诊断。如有不适请及时就医。")
+        else:
+            st.warning("请输入你的问题～")
+
+    st.markdown("---")
+
+    # ====== 科普文章 ======
+    st.markdown("### 📖 健康科普文章")
     articles = get_health_education()
 
     for i, article in enumerate(articles):
